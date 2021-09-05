@@ -1,4 +1,5 @@
 import datetime
+import time
 from random import randint
 
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
@@ -18,7 +19,6 @@ FREE = {}
 vk_session = vk_api.VkApi(token=my_token)
 longpoll = VkLongPoll(vk_session)
 
-p = 1
 Exit = False
 City = ''
 user_old = dict()
@@ -156,97 +156,102 @@ def create_keyboard_for_CITIES():
 
 
 
-for event in longpoll.listen():
-    vk = vk_session.get_api()
-    if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
-        event.text = event.text.lower()
-        for a in CITIES:
-            if a == event.text:
-                Exit = True
+try:
+    for event in longpoll.listen():
+        vk = vk_session.get_api()
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
+            event.text = event.text.lower()
+            for a in CITIES:
+                if a == event.text:
+                    Exit = True
 
-        event.text = event.text.lower()
+            event.text = event.text.lower()
 
-        if event.text in GREETINGS:
-            StartKeyboard = VkKeyboard(one_time=True)
-            StartKeyboard.add_button('Поменять Настройки', color=VkKeyboardColor.NEGATIVE)
-            StartKeyboard.add_button('Хочу погулять', color=VkKeyboardColor.POSITIVE)
-            send('Привет''&#128075;')
-
-        elif event.text == 'пока':
-            send('Пока''&#128533;')
-
-        elif event.text == 'спасибо':
-            send('Обращайся''&#128519;')
-
-        elif event.text in CMD:
-            if event.text != 'поменять настройки':
-                user_old[event.user_id] = []
-
-            vk = vk_session.get_api()
-            StartKeyboard = create_keyboard_for_CITIES()
-            send('Здравствуйте, если вы хотите погулять где-то в Москве, но не знаете где, то можете обратиться ко мне. Для начала выберете город, а потом нажав на кнопку "хочу погулять" вам выдастся 3 случайных мероприятия в ваше городе. если хотите узнать подробнее про одно из них, просто нажмите на кнпку с числом.\nВыберете город:')
-
-        elif Exit == True:
-            Exit = False
-            City = event.text
-            vk = vk_session.get_api()
-            StartKeyboard = VkKeyboard(one_time=True)
-            StartKeyboard.add_button('Все мероприятия', color=VkKeyboardColor.SECONDARY)
-            StartKeyboard.add_button('Бесплатное мероприятие', color=VkKeyboardColor.PRIMARY)
-            send('Выберите формат:')
-
-        elif event.text == 'все мероприятия':
-            vk = vk_session.get_api()
-            StartKeyboard = VkKeyboard(one_time=True)
-            StartKeyboard.add_button('Хочу погулять', color=VkKeyboardColor.POSITIVE)
-            FREE[event.user_id] = False
-            send('Хорошо')
-
-        elif event.text == 'бесплатное мероприятие':
-            FREE[event.user_id] = True
-            vk = vk_session.get_api()
-            StartKeyboard = VkKeyboard(one_time=True)
-            StartKeyboard.add_button('Хочу погулять', color=VkKeyboardColor.POSITIVE)
-            send('Хорошо')
-
-
-        elif event.text == 'хочу погулять':
-                send('Минутку...')
+            if event.text in GREETINGS:
                 StartKeyboard = VkKeyboard(one_time=True)
-                StartKeyboard.add_button('1', color=VkKeyboardColor.SECONDARY)
-                StartKeyboard.add_button('2', color=VkKeyboardColor.SECONDARY)
-                StartKeyboard.add_button('3', color=VkKeyboardColor.SECONDARY)
-                StartKeyboard.add_line()
-                StartKeyboard.add_button('Поменять Настройки', color=VkKeyboardColor.PRIMARY)
+                StartKeyboard.add_button('Поменять Настройки', color=VkKeyboardColor.NEGATIVE)
                 StartKeyboard.add_button('Хочу погулять', color=VkKeyboardColor.POSITIVE)
-                Name = geo(get_names(City, user_old[event.user_id]))
-                user_old[event.user_id].append(Name[0][0])
-                user_old[event.user_id].append(Name[1][0])
-                user_old[event.user_id].append(Name[2][0])
-                send('1 - ' + str(Name[0][0]))
-                send('2 - ' + str(Name[1][0]))
-                send('3 - ' + str(Name[2][0]))
+                send('Привет''&#128075;')
 
-        else:
-            if event.text == '1':
-                if len(Name[0]) == 3:
-                    send(Name[0][0] + ': ' + '\n' + Name[0][2] + '\n' + Name[0][1])
-                else:
-                    send(Name[0][0] + ': ' + '\n' + Name[0][1])
+            elif event.text == 'пока':
+                send('Пока''&#128533;')
 
-            elif event.text == '2':
-                if len(Name[1]) == 3:
-                    send(Name[1][0] + ': ' + '\n' + Name[1][2] + '\n' + Name[1][1])
-                else:
-                    send(Name[1][0] + ': ' + '\n' + Name[1][1])
+            elif event.text == 'спасибо':
+                send('Обращайся''&#128519;')
 
-            elif event.text == '3':
-                if len(Name[2]) == 3:
-                    send(Name[2][0] + ': ' + '\n' + Name[2][2] + '\n' + Name[2][1])
-                else:
-                    send(Name[2][0] + ': ' + '\n' + Name[2][1])
+            elif event.text in CMD:
+                if event.text != 'поменять настройки':
+                    user_old[event.user_id] = []
+
+                vk = vk_session.get_api()
+                StartKeyboard = create_keyboard_for_CITIES()
+                send('Здравствуйте, если вы хотите погулять где-то в Москве, но не знаете где, то можете обратиться ко мне. Для начала выберете город, а потом нажав на кнопку "хочу погулять" вам выдастся 3 случайных мероприятия в ваше городе. если хотите узнать подробнее про одно из них, просто нажмите на кнпку с числом.\nВыберете город:')
+
+            elif Exit == True:
+                Exit = False
+                City = event.text
+                vk = vk_session.get_api()
+                StartKeyboard = VkKeyboard(one_time=True)
+                StartKeyboard.add_button('Все мероприятия', color=VkKeyboardColor.SECONDARY)
+                StartKeyboard.add_button('Бесплатное мероприятие', color=VkKeyboardColor.PRIMARY)
+                send('Выберите формат:')
+
+            elif event.text == 'все мероприятия':
+                vk = vk_session.get_api()
+                StartKeyboard = VkKeyboard(one_time=True)
+                StartKeyboard.add_button('Хочу погулять', color=VkKeyboardColor.POSITIVE)
+                FREE[event.user_id] = False
+                send('Хорошо')
+
+            elif event.text == 'бесплатное мероприятие':
+                FREE[event.user_id] = True
+                vk = vk_session.get_api()
+                StartKeyboard = VkKeyboard(one_time=True)
+                StartKeyboard.add_button('Хочу погулять', color=VkKeyboardColor.POSITIVE)
+                send('Хорошо')
+
+
+            elif event.text == 'хочу погулять':
+                    send('Минутку...')
+                    StartKeyboard = VkKeyboard(one_time=True)
+                    StartKeyboard.add_button('1', color=VkKeyboardColor.SECONDARY)
+                    StartKeyboard.add_button('2', color=VkKeyboardColor.SECONDARY)
+                    StartKeyboard.add_button('3', color=VkKeyboardColor.SECONDARY)
+                    StartKeyboard.add_line()
+                    StartKeyboard.add_button('Поменять Настройки', color=VkKeyboardColor.PRIMARY)
+                    StartKeyboard.add_button('Хочу погулять', color=VkKeyboardColor.POSITIVE)
+                    Name = geo(get_names(City, user_old[event.user_id]))
+                    user_old[event.user_id].append(Name[0][0])
+                    user_old[event.user_id].append(Name[1][0])
+                    user_old[event.user_id].append(Name[2][0])
+                    send('1 - ' + str(Name[0][0]))
+                    send('2 - ' + str(Name[1][0]))
+                    send('3 - ' + str(Name[2][0]))
 
             else:
-                StartKeyboard = VkKeyboard(one_time=True)
-                StartKeyboard.add_button('Начать', color=VkKeyboardColor.SECONDARY)
-                send('Извини, не понял тебя. Напиши "начать" чтобы если хочешь сбросить диалог')
+                if event.text == '1':
+                    if len(Name[0]) == 3:
+                        send(Name[0][0] + ': ' + '\n' + Name[0][2] + '\n' + Name[0][1])
+                    else:
+                        send(Name[0][0] + ': ' + '\n' + Name[0][1])
+
+                elif event.text == '2':
+                    if len(Name[1]) == 3:
+                        send(Name[1][0] + ': ' + '\n' + Name[1][2] + '\n' + Name[1][1])
+                    else:
+                        send(Name[1][0] + ': ' + '\n' + Name[1][1])
+
+                elif event.text == '3':
+                    if len(Name[2]) == 3:
+                        send(Name[2][0] + ': ' + '\n' + Name[2][2] + '\n' + Name[2][1])
+                    else:
+                        send(Name[2][0] + ': ' + '\n' + Name[2][1])
+
+                else:
+                    StartKeyboard = VkKeyboard(one_time=True)
+                    StartKeyboard.add_button('Начать', color=VkKeyboardColor.SECONDARY)
+                    send('Извини, не понял тебя. Напиши "начать" чтобы если хочешь сбросить диалог')
+
+except requests.exceptions.ReadTimeout:
+        print("VK services read timeout")
+        time.sleep(3)
