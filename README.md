@@ -1,6 +1,8 @@
-# Chatbots-Hackathons-2019-Progulochka
-On this hackathon we were given a task to code a chat bot. And we've decided that the bot will give you interesting events in your town.<br>
-Bot is available [here](available)
+# Progulochka bot
+On a chatbots hackathon in 2019 we were given a task to code any chat bot. After some thinking we've decided that we'll implement a bot that will give you interesting events in your town from https://kudago.com  
+Bot is available [here](https://vk.com/bot_for_walk)
+
+### Maybe in future we'll add support for English :)
 
 ![](readme_images/text.jpg)
 
@@ -10,4 +12,4 @@ Bot is available [here](available)
 ![](readme_images/keyboard2.jpg)
 
 
-### Maybe in future we'll add support for English :)
+
